@@ -1,5 +1,6 @@
 
-import { Database } from "lucide-react";
+import { Database, Edit } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -19,6 +20,8 @@ interface DataSourcesMenuProps {
 }
 
 export function DataSourcesMenu({ sources, label }: DataSourcesMenuProps) {
+  const location = useLocation();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
@@ -31,7 +34,7 @@ export function DataSourcesMenu({ sources, label }: DataSourcesMenuProps) {
               tooltip={source.name}
               disabled={source.isPremium}
             >
-              <a href={source.isPremium ? "#" : source.path}>
+              <Link to={source.isPremium ? "#" : source.path}>
                 <Database className="h-5 w-5" />
                 <span>{source.name}</span>
                 {source.isPremium && (
@@ -39,8 +42,15 @@ export function DataSourcesMenu({ sources, label }: DataSourcesMenuProps) {
                     PRO
                   </span>
                 )}
-              </a>
+              </Link>
             </SidebarMenuButton>
+            
+            {!source.isPremium && (
+              <Link to={`${source.path}/create`} className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">
+                <Edit className="h-4 w-4" />
+                <span className="sr-only">Create or edit ad</span>
+              </Link>
+            )}
           </SidebarMenuItem>
         ))}
       </SidebarMenu>
