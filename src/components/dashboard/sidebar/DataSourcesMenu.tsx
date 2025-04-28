@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface DataSourcesMenuProps {
   sources: Array<{
@@ -46,10 +47,20 @@ export function DataSourcesMenu({ sources, label }: DataSourcesMenuProps) {
             </SidebarMenuButton>
             
             {!source.isPremium && (
-              <Link to={`${source.path}/create`} className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">
-                <Edit className="h-4 w-4" />
-                <span className="sr-only">Create or edit ad</span>
-              </Link>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link 
+                      to={`${source.path}/create`} 
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Create or edit ad</span>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>Create or edit ad</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </SidebarMenuItem>
         ))}

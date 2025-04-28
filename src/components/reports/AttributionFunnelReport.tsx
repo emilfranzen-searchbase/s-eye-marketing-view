@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Sankey, Rectangle, Layer } from "recharts";
 import { useToast } from "@/components/ui/use-toast";
-import { Download } from "lucide-react";
+import { Download, Calendar, FilterX } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Sample data for the attribution funnel
 const DEFAULT_ATTRIBUTION_DATA = {
   nodes: [
     { name: "Google Ads" },
@@ -45,7 +44,6 @@ const DEFAULT_ATTRIBUTION_DATA = {
   ],
 };
 
-// Sample table data for common paths
 const DEFAULT_PATHS_DATA = [
   {
     id: 1,
@@ -107,6 +105,7 @@ interface AttributionFunnelReportProps {
 export function AttributionFunnelReport({ language = "en" }: AttributionFunnelReportProps) {
   const [attributionModel, setAttributionModel] = useState("last-click");
   const [timePeriod, setTimePeriod] = useState("30days");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const content = {
@@ -122,6 +121,9 @@ export function AttributionFunnelReport({ language = "en" }: AttributionFunnelRe
       averageValue: "Avg. Value",
       download: "Download Report",
       downloadSuccess: "Report download started",
+      refresh: "Refresh Data",
+      loading: "Loading data...",
+      customRange: "Apply Custom Range",
     },
     sv: {
       title: "Attributionstratt",
@@ -135,6 +137,9 @@ export function AttributionFunnelReport({ language = "en" }: AttributionFunnelRe
       averageValue: "Genomsn. värde",
       download: "Ladda ner rapport",
       downloadSuccess: "Rapportnedladdning startad",
+      refresh: "Uppdatera data",
+      loading: "Laddar data...",
+      customRange: "Använd anpassat datumintervall",
     }
   };
 
@@ -146,6 +151,28 @@ export function AttributionFunnelReport({ language = "en" }: AttributionFunnelRe
       description: new Date().toLocaleDateString(),
     });
   };
+  
+  const handleRefresh = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Data refreshed",
+        description: `Using ${attributionModel} model for the ${timePeriod} period`,
+      });
+    }, 1500);
+  };
+
+  const handleModelOrPeriodChange = (type: string, value: string) => {
+    if (type === 'model') {
+      setAttributionModel(value);
+    } else {
+      setTimePeriod(value);
+    }
+    
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 800);
+  };
 
   return (
     <div className="space-y-6">
@@ -155,9 +182,13 @@ export function AttributionFunnelReport({ language = "en" }: AttributionFunnelRe
           <CardDescription>{currentContent.description}</CardDescription>
           
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
-            <div className="w-full sm:w-1/2">
+            <div className="w-full sm:w-1/3">
               <label className="text-sm font-medium mb-1 block">{currentContent.attribution}</label>
-              <Select value={attributionModel} onValueChange={setAttributionModel}>
+              <Select 
+                value={attributionModel} 
+                onValueChange={(value) => handleModelOrPeriodChange('model', value)}
+                disabled={isLoading}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select model" />
                 </SelectTrigger>
@@ -171,9 +202,13 @@ export function AttributionFunnelReport({ language = "en" }: AttributionFunnelRe
               </Select>
             </div>
             
-            <div className="w-full sm:w-1/2">
+            <div className="w-full sm:w-1/3">
               <label className="text-sm font-medium mb-1 block">{currentContent.period}</label>
-              <Select value={timePeriod} onValueChange={setTimePeriod}>
+              <Select 
+                value={timePeriod} 
+                onValueChange={(value) => handleModelOrPeriodChange('period', value)}
+                disabled={isLoading}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select period" />
                 </SelectTrigger>
@@ -186,27 +221,61 @@ export function AttributionFunnelReport({ language = "en" }: AttributionFunnelRe
                 </SelectContent>
               </Select>
             </div>
+            
+            <div className="w-full sm:w-1/3 flex items-end">
+              <Button 
+                variant="outline" 
+                onClick={handleRefresh} 
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? currentContent.loading : currentContent.refresh}
+              </Button>
+            </div>
           </div>
+
+          {timePeriod === "custom" && (
+            <div className="mt-4 flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">01/04/2023</span>
+              </div>
+              <span className="text-sm text-muted-foreground">to</span>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">30/04/2023</span>
+              </div>
+              <Button size="sm" variant="outline">
+                {currentContent.customRange}
+              </Button>
+              <Button size="sm" variant="ghost">
+                <FilterX className="h-4 w-4 mr-1" />
+                Clear
+              </Button>
+            </div>
+          )}
         </CardHeader>
         
         <CardContent>
-          <div className="h-[400px] w-full">
-            <ChartContainer config={{}} className="h-full">
-              <Sankey
-                data={DEFAULT_ATTRIBUTION_DATA}
-                node={
-                  <Layer>
-                    <Rectangle fill="#8B5CF6" fillOpacity={0.85} />
-                  </Layer>
-                }
-                link={{ stroke: "#aaa" }}
-                margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
-                nodeWidth={20}
-                nodePadding={60}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-            </ChartContainer>
-          </div>
+          {isLoading ? (
+            <div className="h-[400px] w-full flex items-center justify-center bg-muted/20">
+              <Skeleton className="h-[350px] w-[90%]" />
+            </div>
+          ) : (
+            <div className="h-[400px] w-full">
+              <ChartContainer config={{}} className="h-full">
+                <Sankey
+                  data={DEFAULT_ATTRIBUTION_DATA}
+                  node={<Rectangle fill="#8B5CF6" fillOpacity={0.85} />}
+                  link={{ stroke: "#aaa" }}
+                  margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                  nodeWidth={20}
+                  nodePadding={60}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </ChartContainer>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -218,34 +287,42 @@ export function AttributionFunnelReport({ language = "en" }: AttributionFunnelRe
               Top converting customer journeys based on your selected attribution model
             </CardDescription>
           </div>
-          <Button variant="outline" size="sm" onClick={handleDownload}>
+          <Button variant="outline" size="sm" onClick={handleDownload} disabled={isLoading}>
             <Download className="h-4 w-4 mr-2" />
             {currentContent.download}
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{currentContent.path}</TableHead>
-                  <TableHead className="text-right">{currentContent.conversions}</TableHead>
-                  <TableHead className="text-right">{currentContent.conversionRate}</TableHead>
-                  <TableHead className="text-right">{currentContent.averageValue}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {DEFAULT_PATHS_DATA.map((path) => (
-                  <TableRow key={path.id}>
-                    <TableCell className="font-medium">{path.path}</TableCell>
-                    <TableCell className="text-right">{path.conversions}</TableCell>
-                    <TableCell className="text-right">{path.conversionRate}</TableCell>
-                    <TableCell className="text-right">{path.averageValue}</TableCell>
+          {isLoading ? (
+            <div className="space-y-2">
+              {Array(5).fill(0).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{currentContent.path}</TableHead>
+                    <TableHead className="text-right">{currentContent.conversions}</TableHead>
+                    <TableHead className="text-right">{currentContent.conversionRate}</TableHead>
+                    <TableHead className="text-right">{currentContent.averageValue}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {DEFAULT_PATHS_DATA.map((path) => (
+                    <TableRow key={path.id}>
+                      <TableCell className="font-medium">{path.path}</TableCell>
+                      <TableCell className="text-right">{path.conversions}</TableCell>
+                      <TableCell className="text-right">{path.conversionRate}</TableCell>
+                      <TableCell className="text-right">{path.averageValue}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

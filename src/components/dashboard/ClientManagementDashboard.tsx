@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -190,13 +189,23 @@ export default function ClientManagementDashboard({ language = "en" }: ClientMan
     setClients(clients.filter(client => client.id !== clientId));
   };
 
-  // Helper function to format currency
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       maximumFractionDigits: 0,
     }).format(value);
+  };
+
+  const getBadgeVariant = (status: string) => {
+    switch (status) {
+      case "active":
+        return "default";
+      case "inactive":
+        return "destructive";
+      default:
+        return "outline";
+    }
   };
 
   return (
@@ -302,13 +311,8 @@ export default function ClientManagementDashboard({ language = "en" }: ClientMan
                     <TableCell>{client.industry}</TableCell>
                     <TableCell>
                       <Badge
-                        variant={
-                          client.status === "active"
-                            ? "success"
-                            : client.status === "inactive"
-                            ? "destructive"
-                            : "outline"
-                        }
+                        variant={getBadgeVariant(client.status)}
+                        className={client.status === "active" ? "bg-green-500 hover:bg-green-600" : ""}
                       >
                         {client.status === "active"
                           ? currentContent.clientsTable.status.active
@@ -348,6 +352,13 @@ export default function ClientManagementDashboard({ language = "en" }: ClientMan
                     </TableCell>
                   </TableRow>
                 ))}
+                {filteredClients.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                      No clients found matching your search criteria
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
