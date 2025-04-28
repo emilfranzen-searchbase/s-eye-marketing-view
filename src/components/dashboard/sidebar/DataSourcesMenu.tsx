@@ -29,7 +29,7 @@ export function DataSourcesMenu({ sources, label }: DataSourcesMenuProps) {
               asChild
               isActive={location.pathname === source.path}
               tooltip={source.name}
-              isDisabled={source.isPremium}
+              disabled={source.isPremium}
             >
               <a href={source.isPremium ? "#" : source.path}>
                 <Database className="h-5 w-5" />

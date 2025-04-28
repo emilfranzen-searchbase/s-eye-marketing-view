@@ -8,6 +8,7 @@ import { TrendChart } from "@/components/dashboard/widgets/TrendChart";
 import { DataSourcesList } from "@/components/dashboard/widgets/DataSourcesList";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import {
   ChartBar,
   ArrowUp,
@@ -15,7 +16,6 @@ import {
   Database
 } from "lucide-react";
 
-// Move mock data to separate files in a real application
 const performanceData = [
   { name: "Jan", impressions: 4000, clicks: 2400, conversions: 240 },
   { name: "Feb", impressions: 3000, clicks: 1398, conversions: 210 },
@@ -124,84 +124,84 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <DashboardSidebar language={language} />
-      
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <DashboardHeader 
-          language={language} 
-          setLanguage={setLanguage} 
-          title={currentContent.title}
-        />
+    <SidebarProvider>
+      <div className="flex h-screen overflow-hidden w-full">
+        <DashboardSidebar language={language} />
         
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-          <div className="mb-8">
-            <h2 className="text-lg font-medium text-gray-700">{currentContent.welcome}</h2>
-          </div>
-
-          {/* Timeframe selector */}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-brand-dark">{currentContent.summary}</h2>
-            <div className="flex items-center">
-              <span className="text-sm text-gray-500 mr-2">{currentContent.timeframe}:</span>
-              <Select value={timeframe} onValueChange={setTimeframe}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder={currentContent.last_30_days} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7days">{currentContent.last_7_days}</SelectItem>
-                  <SelectItem value="30days">{currentContent.last_30_days}</SelectItem>
-                  <SelectItem value="90days">{currentContent.last_90_days}</SelectItem>
-                  <SelectItem value="ytd">{currentContent.year_to_date}</SelectItem>
-                </SelectContent>
-              </Select>
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <DashboardHeader 
+            language={language} 
+            setLanguage={setLanguage} 
+            title={currentContent.title}
+          />
+          
+          <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+            <div className="mb-8">
+              <h2 className="text-lg font-medium text-gray-700">{currentContent.welcome}</h2>
             </div>
-          </div>
 
-          {/* Stats cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatsCard
-              title={currentContent.impressions}
-              value="24,567"
-              change={12.5}
-            />
-            <StatsCard
-              title={currentContent.clicks}
-              value="1,234"
-              change={8.2}
-            />
-            <StatsCard
-              title={currentContent.conversions}
-              value="87"
-              change={-3.1}
-            />
-            <StatsCard
-              title={currentContent.ctr}
-              value="5.02%"
-              change={0.8}
-            />
-          </div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-brand-dark">{currentContent.summary}</h2>
+              <div className="flex items-center">
+                <span className="text-sm text-gray-500 mr-2">{currentContent.timeframe}:</span>
+                <Select value={timeframe} onValueChange={setTimeframe}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder={currentContent.last_30_days} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7days">{currentContent.last_7_days}</SelectItem>
+                    <SelectItem value="30days">{currentContent.last_30_days}</SelectItem>
+                    <SelectItem value="90days">{currentContent.last_90_days}</SelectItem>
+                    <SelectItem value="ytd">{currentContent.year_to_date}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PerformanceChart
-              data={performanceData}
-              title={currentContent.performance}
-            />
-            <TrendChart
-              data={trendData}
-              title={currentContent.trends}
-            />
-            <DataSourcesList
-              sources={dataSources}
-              onConnect={handleConnectSource}
-              labels={{
-                title: currentContent.data_sources.title,
-                connectSource: currentContent.connect_source
-              }}
-            />
-          </div>
-        </main>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <StatsCard
+                title={currentContent.impressions}
+                value="24,567"
+                change={12.5}
+              />
+              <StatsCard
+                title={currentContent.clicks}
+                value="1,234"
+                change={8.2}
+              />
+              <StatsCard
+                title={currentContent.conversions}
+                value="87"
+                change={-3.1}
+              />
+              <StatsCard
+                title={currentContent.ctr}
+                value="5.02%"
+                change={0.8}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PerformanceChart
+                data={performanceData}
+                title={currentContent.performance}
+              />
+              <TrendChart
+                data={trendData}
+                title={currentContent.trends}
+              />
+              <DataSourcesList
+                sources={dataSources}
+                onConnect={handleConnectSource}
+                labels={{
+                  title: currentContent.data_sources.title,
+                  connectSource: currentContent.connect_source
+                }}
+              />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
