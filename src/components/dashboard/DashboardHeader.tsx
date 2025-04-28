@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell, Search, Settings, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AccountSelector } from "./AccountSelector";
 
 interface DashboardHeaderProps {
   language: "en" | "sv";
@@ -21,7 +21,6 @@ interface DashboardHeaderProps {
 export default function DashboardHeader({ language, setLanguage, title }: DashboardHeaderProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Multi-language content
   const content = {
     en: {
       searchPlaceholder: "Search...",
@@ -42,6 +41,10 @@ export default function DashboardHeader({ language, setLanguage, title }: Dashbo
   return (
     <header className="flex h-16 items-center border-b border-gray-200 px-4 bg-white">
       <h1 className="text-xl font-semibold text-brand-dark">{title}</h1>
+      
+      <div className="ml-4">
+        <AccountSelector language={language} />
+      </div>
       
       <div className="ml-auto flex items-center space-x-4">
         <div className="relative hidden md:block">
