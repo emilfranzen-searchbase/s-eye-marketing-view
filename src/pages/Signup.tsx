@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Google } from "lucide-react";
+import { LogIn } from "lucide-react";
 import { toast } from "sonner";
 
 const Signup = () => {
@@ -17,7 +16,6 @@ const Signup = () => {
   const [language, setLanguage] = useState<'en' | 'sv'>('en');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Multi-language content
   const content = {
     en: {
       title: "Create an account",
@@ -53,9 +51,7 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate signup process
     try {
-      // In a real app, this would be an API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast.success("Account created successfully!");
@@ -70,9 +66,7 @@ const Signup = () => {
   const handleGoogleSignup = async () => {
     setIsLoading(true);
     
-    // Simulate Google signup process
     try {
-      // In a real app, this would integrate with Google OAuth
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast.success("Google signup successful!");
@@ -86,7 +80,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Language Switcher */}
       <div className="absolute top-4 right-4 z-10">
         <div className="flex space-x-2">
           <button 
@@ -177,7 +170,7 @@ const Signup = () => {
               onClick={handleGoogleSignup}
               disabled={isLoading}
             >
-              <Google className="mr-2 h-4 w-4" /> {currentContent.googleSignup}
+              <LogIn className="mr-2 h-4 w-4" /> {currentContent.googleSignup}
             </Button>
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
